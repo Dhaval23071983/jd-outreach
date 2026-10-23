@@ -13,7 +13,7 @@ import { exec } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const PORT = 3041;
+const PORT = parseInt(process.env.SETUP_PORT ?? "3099", 10);
 
 const manifest = JSON.parse(fs.readFileSync(path.join(here, "app.manifest.json"), "utf8"));
 
