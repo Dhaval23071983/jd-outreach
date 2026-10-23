@@ -74,7 +74,7 @@
       "path": "profile/ties.json",
       "required": true,
       "multiline": true,
-      "prompt": "Paste your ties.json — see profile.example/ties.json for the format. List every employer, school, and city associated with your career."
+      "prompt": "Paste your ties as JSON — must match this format exactly:\n{\n  \"employers\": [\"Amazon\", \"Copart\"],\n  \"schools\": [\"NMIMS\"],\n  \"places\": [\"Dallas\", \"Mumbai\"]\n}\nList every employer, school, and city associated with your career."
     },
     {
       "key": "env_owner_name",

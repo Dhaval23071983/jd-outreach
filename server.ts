@@ -992,9 +992,19 @@ type Contact = {
 // the better route is usually a referral from someone at the company who shares ${ownerName}'s background.
 
 const TIES_PATH = path.join(here, "profile", "ties.json");
-const TIES: { employers: string[]; schools: string[]; places: string[] } = fs.existsSync(TIES_PATH)
-  ? JSON.parse(fs.readFileSync(TIES_PATH, "utf8"))
-  : { employers: [], schools: [], places: [] };
+function parseTies(): { employers: string[]; schools: string[]; places: string[] } {
+  if (!fs.existsSync(TIES_PATH)) return { employers: [], schools: [], places: [] };
+  const raw = fs.readFileSync(TIES_PATH, "utf8").trim();
+  try {
+    return JSON.parse(raw);
+  } catch {
+    // Plain comma-separated list — treat all items as employers
+    const items = raw.split(/[,\n]+/).map(s => s.trim()).filter(Boolean);
+    console.warn(`⚠  profile/ties.json is not valid JSON. Treating as a flat list of employers.\n   To use the full format, re-run: npm run setup`);
+    return { employers: items, schools: [], places: [] };
+  }
+}
+const TIES = parseTies();
 const tiesText = `${ownerName}'s employers: ${TIES.employers.join(", ")}. Schools: ${TIES.schools.join(", ")}. Cities: ${TIES.places.join(", ")}.`;
 
 const GroundSchema = z.object({
