@@ -63,11 +63,11 @@ function ask(question: string): Promise<string> {
 /** Reads lines until the user enters END on its own line. */
 async function askMultiline(prompt: string): Promise<string> {
   console.log(`\n${prompt}`);
-  console.log("  (Paste your content, then type END on a new line and press Enter)\n");
+  console.log("  (Paste your content, then type end on a new line and press Enter)\n");
   const lines: string[] = [];
   return new Promise((resolve) => {
     rl.on("line", function handler(line) {
-      if (line.trim() === "END") {
+      if (line.trim().toUpperCase() === "END") {
         rl.removeListener("line", handler);
         resolve(lines.join("\n").trim());
       } else {
