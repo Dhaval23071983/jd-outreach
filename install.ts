@@ -135,8 +135,12 @@ async function handleFileSlot(slot: FileSlot, installDir: string): Promise<boole
   if (mode.trim().toLowerCase() === "f") {
     const filePath = (await ask("  File path: ")).trim();
     const resolved = path.resolve(filePath);
-    if (!fs.existsSync(resolved)) {
-      console.log(yellow(`  File not found: ${resolved}. Try pasting instead.`));
+    if (!fs.existsSync(resolved) || fs.statSync(resolved).isDirectory()) {
+      if (fs.existsSync(resolved)) {
+        console.log(yellow(`  That path is a directory. Provide a file path instead, or switch to paste mode.`));
+      } else {
+        console.log(yellow(`  File not found: ${resolved}. Switching to paste mode.`));
+      }
       content = await askMultiline(slot.prompt);
     } else {
       content = fs.readFileSync(resolved, "utf8").trim();
