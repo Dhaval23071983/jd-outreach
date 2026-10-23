@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "setup": "npx tsx install.ts",
+    "setup": "npx tsx setup.ts",
     "dev": "node --env-file-if-exists=.env --watch --import tsx server.ts",
     "start": "node --env-file-if-exists=.env --import tsx server.ts",
     "typecheck": "tsc --noEmit"
