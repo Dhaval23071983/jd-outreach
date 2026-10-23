@@ -1,0 +1,1479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JD Outreach</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --panel: #ffffff; --ink: #1c1c1a; --muted: #6b6b66; --line: #e4e3de;
+    --accent: #2f5bea; --accent-ink: #fff; --ok: #1f7a4d; --warn: #a15c00; --err: #b3261e; --due-bg: #fff4e5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141413; --panel: #1d1d1b; --ink: #ecebe6; --muted: #9b9a94; --line: #2e2e2b;
+      --accent: #7b9bff; --accent-ink: #0d0d0c; --ok: #5cc08c; --warn: #e0a34a; --err: #ff8a80; --due-bg: #2b2213; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+  main { max-width: 920px; margin: 0 auto; padding: 24px 16px 80px; }
+  h1 { font-size: 22px; margin: 0; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  nav { display: flex; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 4px; }
+  nav button { margin: 0; background: transparent; color: var(--muted); padding: 6px 14px; }
+  nav button.on { background: var(--accent); color: var(--accent-ink); }
+  .badge { display: inline-block; min-width: 20px; padding: 0 6px; border-radius: 99px; background: var(--err); color: #fff; font-size: 12px; margin-left: 6px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; }
+  h3 { font-size: 15px; margin: 16px 0 6px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 4px; }
+  textarea, input, select { width: 100%; font: inherit; color: inherit; background: var(--bg);
+    border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  textarea { resize: vertical; }
+  select.inline { width: auto; padding: 4px 8px; font-size: 14px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
+  button, .btn { display: inline-block; font: inherit; font-weight: 600; border: 0; border-radius: 8px; padding: 10px 16px;
+    cursor: pointer; background: var(--accent); color: var(--accent-ink); margin: 14px 8px 0 0; text-decoration: none; }
+  button.ghost, .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--line); }
+  button.small, .btn.small { padding: 6px 12px; font-size: 14px; margin-top: 10px; }
+  button:disabled { opacity: .5; cursor: wait; }
+  .kv { display: grid; grid-template-columns: 170px 1fr; gap: 6px 16px; margin: 0; }
+  @media (max-width: 640px) { .kv { grid-template-columns: 1fr; } }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; font-weight: 500; }
+  .note { color: var(--muted); font-size: 14px; margin-top: 8px; }
+  .ok-note { color: var(--ok); font-size: 14px; margin-top: 8px; }
+  .verdict { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .verdict b { font-size: 24px; text-transform: capitalize; }
+  .strong, .good, .high { color: var(--ok); } .stretch, .medium { color: var(--warn); } .poor, .low { color: var(--err); }
+  ul { margin: 4px 0; padding-left: 20px; }
+  .card { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-top: 10px; cursor: pointer; }
+  .card.sel { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .card .t { font-weight: 600; }
+  .pill { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 99px; border: 1px solid currentColor; margin-left: 6px; }
+  .tag { font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .subj { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-top: 8px; cursor: pointer; }
+  .subj input { width: auto; margin-top: 4px; }
+  .subj .angle { font-size: 12px; color: var(--muted); }
+  .story-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .story-row select { flex: 1; min-width: 220px; }
+  .err { color: var(--err); margin-top: 10px; }
+  .hidden { display: none !important; }
+  a { color: var(--accent); }
+  details summary { cursor: pointer; color: var(--muted); font-size: 14px; margin-top: 12px; }
+  .entry { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-top: 12px; background: var(--panel); }
+  .entry.due { border-color: var(--warn); background: var(--due-bg); }
+  .entry-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+  .entry-head b { font-size: 16px; }
+  .dueline { font-weight: 600; color: var(--warn); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip { font-size: 13px; padding: 3px 10px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); background: transparent; margin: 0; font-weight: 500; cursor: default; }
+  .chip.on { border-color: var(--ok); color: var(--ok); }
+  .chip.gap { border-style: dashed; color: var(--err); border-color: var(--err); }
+  button.chip { cursor: pointer; }
+  button.chip.sel { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .score { font-weight: 700; }
+  .part-guide { font-size: 13px; color: var(--muted); margin: 2px 0 4px; }
+  .coach { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-top: 12px; }
+  .coach h3 { margin-top: 0; }
+  .tbl-wrap { overflow-x: auto; }
+  table.grid { border-collapse: collapse; width: 100%; font-size: 14px; }
+  table.grid th, table.grid td { border-bottom: 1px solid var(--line); padding: 8px 6px; text-align: left; vertical-align: top; }
+  table.grid th { color: var(--muted); font-weight: 600; font-size: 12px; white-space: normal; line-height: 1.25; }
+  table.grid td.num { text-align: center; font-variant-numeric: tabular-nums; }
+  table.grid td.zero { color: var(--line); }
+  table.grid tr.today td { background: var(--due-bg); }
+  table.grid tr.future td { color: var(--muted); }
+  .what { font-size: 13px; line-height: 1.5; }
+  #dayTable tr:not(:has(td.what)) td { border-bottom: 0; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>JD Outreach</h1>
+    <nav>
+      <button id="tabStories">Stories</button>
+      <button id="tabJobs">Jobs<span id="jobsBadge" class="badge hidden" style="background:var(--ok)"></span></button>
+      <button id="tabNew" class="on">New application</button>
+      <button id="tabTracker">Tracker<span id="dueBadge" class="badge hidden"></span></button>
+    </nav>
+  </header>
+
+  <!-- ================= Stories ================= -->
+  <div id="viewStories" class="hidden">
+    <section>
+      <h2>Your story bank</h2>
+      <p class="note" style="margin-top:0">Every fit check, CV, outreach email, and cover letter is built from these stories. Aim for 6-8 strong stories that together cover the competencies below. A competency with no story shows in red.</p>
+      <div id="coverage" class="chips"></div>
+      <button id="storyNew">+ New story</button>
+      <button id="storyImport" class="ghost">Import a story I've written</button>
+      <details>
+        <summary>How to build a strong story</summary>
+        <div id="methodGuide"></div>
+      </details>
+    </section>
+
+    <section id="storyEditor" class="hidden">
+      <h2 id="editorTitle">New story</h2>
+      <label>What should this story prove? (pick 1-3)</label>
+      <div id="compPick" class="chips"></div>
+      <div id="compQuestion" class="note"></div>
+
+      <div id="roughNotes">
+        <label for="n_situation">What was the situation, and what was at stake?</label>
+        <textarea id="n_situation" rows="3"></textarea>
+        <label for="n_hard">What made it hard, or what told you it was bigger than it looked?</label>
+        <textarea id="n_hard" rows="2"></textarea>
+        <label for="n_actions">What did YOU do? List 2-3 decisions you personally made.</label>
+        <textarea id="n_actions" rows="4"></textarea>
+        <label for="n_pushback">Who pushed back or said no, and how did you bring them around? (optional)</label>
+        <textarea id="n_pushback" rows="2"></textarea>
+        <label for="n_result">What changed? Numbers before and after.</label>
+        <textarea id="n_result" rows="2"></textarea>
+        <label for="n_lesson">What do you do differently now because of it?</label>
+        <textarea id="n_lesson" rows="2"></textarea>
+        <div class="note">Rough is fine. The coach shapes it and tells you what's missing.</div>
+      </div>
+      <div id="importBox" class="hidden">
+        <label for="importText">Paste a story you've already written (any format)</label>
+        <textarea id="importText" rows="12"></textarea>
+      </div>
+      <button id="shapeBtn">Shape with the coach (~$0.05)</button>
+      <div id="shapeStatus" class="note hidden">The coach is shaping your story…</div>
+      <div id="shapeErr" class="err hidden"></div>
+
+      <div id="shaped" class="hidden">
+        <div class="row">
+          <div><label for="s_title">Title</label><input id="s_title" /></div>
+          <div class="row">
+            <div><label for="s_company">Company</label><input id="s_company" /></div>
+            <div><label for="s_period">When</label><input id="s_period" placeholder="e.g. 2024-2026" /></div>
+          </div>
+        </div>
+        <div id="partFields"></div>
+        <label>Numbers and their baselines</label>
+        <div id="numbersList" class="note"></div>
+        <div class="coach" id="coachBox"></div>
+        <label for="answers">Answer the coach's questions here, then click Improve</label>
+        <textarea id="answers" rows="4" placeholder="e.g. Re-runs were 31% of specialty auctions before. The 22 FTEs were out of a 60-person listing team."></textarea>
+        <button id="improveBtn" class="ghost">Improve with my edits and answers (~$0.05)</button>
+        <button id="saveStory">Save story</button>
+        <label style="display:inline-flex;gap:6px;align-items:center;margin-left:8px"><input type="checkbox" id="s_use" checked style="width:auto" /> Use in CVs and outreach</label>
+        <div id="saveNote" class="note"></div>
+      </div>
+    </section>
+
+    <div id="storyCards"></div>
+  </div>
+
+  <!-- ================= New application ================= -->
+  <div id="viewNew">
+    <section>
+      <h2>General CV</h2>
+      <div class="note">No role in mind? One CV for networking contacts, built from your base CV and stories.</div>
+      <button id="genCv" class="ghost small">Build general CV (~$0.05)</button>
+      <a id="genCvOpen" class="btn ghost small hidden" download>Download general CV</a>
+      <div id="genCvNote" class="note"></div>
+    </section>
+
+    <section>
+      <h2>1 · Job description</h2>
+      <label for="company">Company (optional if the JD names it)</label>
+      <input id="company" placeholder="e.g. Stripe" />
+      <label for="jd">Job description</label>
+      <textarea id="jd" rows="10" placeholder="Paste the full JD here"></textarea>
+      <div id="profile" class="note"></div>
+      <button id="assess">Check fit</button>
+      <div id="assessStatus" class="note hidden">Reading the JD against your CV…</div>
+      <div id="assessErr" class="err hidden"></div>
+      <div id="spend" class="note"></div>
+    </section>
+
+    <section id="fitSec" class="hidden">
+      <h2>2 · Fit</h2>
+      <div class="verdict"><b id="verdict"></b><span id="score" class="note"></span></div>
+      <p id="recommendation"></p>
+      <div class="row">
+        <div><h3>Why it fits</h3><ul id="for"></ul></div>
+        <div><h3>Gaps and risks</h3><ul id="against"></ul></div>
+      </div>
+      <details>
+        <summary>Where the role sits</summary>
+        <dl class="kv" id="org" style="margin-top:10px"></dl>
+      </details>
+      <h3>Story to lead your outreach with</h3>
+      <div class="note">Ranked for this JD. The email, recruiter email, and cover letter are built around the one you pick.</div>
+      <div id="storyOptions"></div>
+      <div class="story-row" style="margin-top:8px">
+        <label for="storyOther" style="margin:0">Or pick another:</label>
+        <select id="storyOther"></select>
+      </div>
+      <div class="story-row" style="margin-top:8px">
+        <label for="storySecond" style="margin:0">Also highlight (optional):</label>
+        <select id="storySecond"></select>
+      </div>
+      <div class="note">A second story goes on the CV (summary and its job) and into the cover letter. The email stays on the lead story.</div>
+      <label for="hiringTeam">Names on the job post (optional)</label>
+      <textarea id="hiringTeam" rows="2" placeholder="LinkedIn job posts often show &quot;Meet the hiring team&quot;. Paste the names and titles here, e.g. Jane Doe, VP Product"></textarea>
+      <button id="go">Go ahead</button>
+      <button id="skipRole" class="ghost">Skip this role: try another JD</button>
+      <div id="goStatus" class="note hidden">Tailoring your CV and finding the hiring manager, then drafting. This takes 30–90 seconds.</div>
+      <div id="goErr" class="err hidden"></div>
+    </section>
+
+    <section id="cvSec" class="hidden">
+      <h2>3 · Tailored CV</h2>
+      <p id="cvSummary"></p>
+      <a id="cvOpen" class="btn" download>Download PDF</a>
+      <button id="clMake" class="ghost">Create cover letter (~$0.02)</button>
+      <a id="clOpen" class="btn ghost hidden" download>Download cover letter</a>
+      <div id="clNote" class="note">Only if the application asks for one.</div>
+      <details><summary>Preview all bullets</summary><div id="cvPreview"></div></details>
+    </section>
+
+    <section id="hmSec" class="hidden">
+      <h2>4 · Hiring manager</h2>
+      <div id="hmNotes" class="note"></div>
+      <div id="groundBox" class="note hidden"></div>
+      <div id="cands"></div>
+      <div class="row">
+        <div><label for="hmName">Name</label><input id="hmName" /></div>
+        <div><label for="hmTitle">Title</label><input id="hmTitle" /></div>
+      </div>
+      <div class="row">
+        <div><label for="domain">Company domain</label><input id="domain" placeholder="company.com" /></div>
+        <div><label for="email">Email</label><input id="email" /></div>
+      </div>
+      <div id="emailNote" class="note"></div>
+      <button id="findEmail" class="ghost">Find email</button>
+      <button id="webSearch" class="ghost">Search again (~$0.05)</button>
+      <button id="redraft" class="ghost">Rewrite email for this person</button>
+      <div class="note">Picked a different person above, or typed a name? "Rewrite email for this person" writes a new email addressed to them (~$0.01).</div>
+    </section>
+
+    <section id="refSec" class="hidden">
+      <h2>Warm route · people who could refer you</h2>
+      <div class="note">People at this company who share your background (ex-Amazon, ex-Copart, NMIMS). A referral from one of them reaches the hiring manager with someone vouching for you, which cold emails don't. Send a LinkedIn note first.</div>
+      <div id="refList"></div>
+    </section>
+
+    <section id="draftSec" class="hidden">
+      <h2>5 · Outreach email</h2>
+      <label for="storyDraft">Lead story</label>
+      <div class="story-row">
+        <select id="storyDraft"></select>
+        <button id="storyRewrite" class="ghost small" style="margin-top:0">Rewrite around this story (~$0.01)</button>
+      </div>
+      <label>Subject: pick one</label>
+      <div id="subjects"></div>
+      <label for="body">Body (edit freely before sending)</label>
+      <textarea id="body" rows="18"></textarea>
+      <button id="copyTable">Copy with table (for Gmail)</button>
+      <button id="copy" class="ghost">Copy plain text</button>
+      <a id="mailto" class="btn ghost">Open in mail app</a>
+      <button id="markSent">I sent it: start follow-up timer</button>
+      <button id="nextApp" class="ghost">Start next application</button>
+      <div id="sentNote" class="note">Saved in the Tracker as "Drafted". After you send it, click the button above to start the follow-up timer.</div>
+      <div id="draftErr" class="err hidden"></div>
+    </section>
+
+    <section id="recSec" class="hidden">
+      <h2>6 · Recruiter (optional second contact)</h2>
+      <div id="rNotes" class="note"></div>
+      <div id="rCands"></div>
+      <div class="row">
+        <div><label for="rName">Name</label><input id="rName" /></div>
+        <div><label for="rTitle">Title</label><input id="rTitle" /></div>
+      </div>
+      <div class="row">
+        <div><label for="rEmail">Email</label><input id="rEmail" /></div>
+        <div></div>
+      </div>
+      <div id="rEmailNote" class="note"></div>
+      <button id="rFindEmail" class="ghost">Find email</button>
+      <button id="rWebSearch" class="ghost">Search again for a recruiter (~$0.05)</button>
+      <button id="rDraft">Draft email to recruiter (~$0.01)</button>
+    </section>
+
+    <section id="rDraftSec" class="hidden">
+      <h2>7 · Email to recruiter</h2>
+      <label>Subject: pick one</label>
+      <div id="rSubjects"></div>
+      <label for="rBody">Body (edit freely before sending)</label>
+      <textarea id="rBody" rows="16"></textarea>
+      <button id="rCopyTable">Copy with table (for Gmail)</button>
+      <button id="rCopy" class="ghost">Copy plain text</button>
+      <a id="rMailto" class="btn ghost">Open in mail app</a>
+      <button id="rMarkSent">I sent it: start follow-up timer</button>
+      <div id="rSentNote" class="note">Saved in the Tracker as a separate "Recruiter" entry with its own follow-up timer.</div>
+      <div id="rDraftErr" class="err hidden"></div>
+    </section>
+  </div>
+
+  <!-- ================= Jobs ================= -->
+  <div id="viewJobs" class="hidden">
+    <section>
+      <h2>Today's jobs</h2>
+      <div id="jobsMeta" class="note"></div>
+      <button class="ghost small" id="jobsRefresh">Check for new jobs now</button>
+      <div class="note">Senior product roles posted in the last 10 days (60 days at AI companies, where roles stay open longer), read from each company's own job board, so every one is still open. Checked automatically each morning.</div>
+    </section>
+    <div id="jobsList"></div>
+  </div>
+
+  <!-- ================= Tracker ================= -->
+  <div id="viewTracker" class="hidden">
+    <section id="connSec">
+      <h2>LinkedIn connections <span id="connCount" class="tag"></span></h2>
+      <div class="note">Requests sent with no note. When someone accepts, click Accepted to draft your first message.</div>
+      <div id="connList"></div>
+    </section>
+
+    <section id="fuQueue" class="hidden">
+      <h2>Follow-ups due <span id="fuCount" class="tag"></span></h2>
+      <div id="fuCard"></div>
+    </section>
+
+    <section>
+      <h2>Tracker</h2>
+      <div id="trackerSummary" class="note"></div>
+      <a class="btn ghost small" href="/api/tracker.csv">Export CSV</a>
+    </section>
+
+    <section>
+      <h2>Where things stand</h2>
+      <div class="tbl-wrap"><table class="grid" id="standTable"></table></div>
+    </section>
+
+    <section>
+      <h2>Day by day</h2>
+      <div class="note" style="margin-top:0">What happened each day, newest first. Upcoming days show follow-ups coming due.</div>
+      <div class="tbl-wrap"><table class="grid" id="dayTable"></table></div>
+    </section>
+    <div id="entries"></div>
+  </div>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const state = { jd: "", analysis: null, fit: null, candidates: [], selected: null, emailPattern: null, entryId: null, subjects: [], cvFile: null };
+const rec = { candidates: [], selected: null, pattern: null, subjects: [], entryId: null };
+let allStories = [];
+fetch("/api/stories").then((r) => r.json()).then((d) => { allStories = d.stories; }).catch(() => {});
+
+// The ranked options come first in every story list; the rest of the story bank follows.
+function storySelectHtml(selected) {
+  const ranked = (state.storyOptions ?? []).map((o) => o.title);
+  const rest = allStories.map((s) => s.title).filter((t) => !ranked.includes(t));
+  const opt = (t) => `<option ${t === selected ? "selected" : ""}>${esc(t)}</option>`;
+  return `<optgroup label="Best for this JD">${ranked.map(opt).join("")}</optgroup>` +
+    (rest.length ? `<optgroup label="Other stories">${rest.map(opt).join("")}</optgroup>` : "");
+}
+function setLeadStory(title) {
+  state.leadStory = title;
+  document.querySelectorAll('input[name="story"]').forEach((r) => r.checked = r.value === title);
+  $("storyOther").innerHTML = `<option value="">—</option>` + storySelectHtml(state.storyOptions?.some((o) => o.title === title) ? "" : title);
+  $("storyDraft").innerHTML = storySelectHtml(title);
+  if (state.secondStory === title) state.secondStory = null;
+  renderSecondStory();
+}
+// The second story: any story except the lead, or none.
+function renderSecondStory() {
+  const ranked = (state.storyOptions ?? []).map((o) => o.title);
+  const rest = allStories.map((s) => s.title).filter((t) => !ranked.includes(t));
+  const opt = (t) => t === state.leadStory ? "" : `<option ${t === state.secondStory ? "selected" : ""}>${esc(t)}</option>`;
+  $("storySecond").innerHTML = `<option value="">— None —</option><optgroup label="Best for this JD">${ranked.map(opt).join("")}</optgroup>` +
+    (rest.length ? `<optgroup label="Other stories">${rest.map(opt).join("")}</optgroup>` : "");
+}
+function renderStoryOptions(options) {
+  state.storyOptions = options;
+  $("storyOptions").innerHTML = options.map((o, i) => `
+    <label class="subj"><input type="radio" name="story" value="${esc(o.title)}" ${i === 0 ? "checked" : ""} />
+      <span><span>${esc(o.title)}</span><br /><span class="angle">${esc(o.why)}</span></span></label>`).join("");
+  document.querySelectorAll('input[name="story"]').forEach((r) => r.onchange = () => setLeadStory(r.value));
+  setLeadStory(options[0]?.title ?? null);
+}
+$("storyOther").onchange = (e) => { if (e.target.value) setLeadStory(e.target.value); };
+$("storySecond").onchange = (e) => { state.secondStory = e.target.value || null; saveSession(); };
+let spent = 0;
+
+function addCost(c, cached) {
+  if (cached) { $("spend").textContent = `Loaded from cache (no charge). Session total: $${spent.toFixed(3)}`; return; }
+  spent += c || 0;
+  $("spend").textContent = `Last step: $${(c || 0).toFixed(3)} · Session total: $${spent.toFixed(3)}`;
+}
+async function api(method, url, body) {
+  const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Request failed");
+  return data;
+}
+const post = (url, body) => api("POST", url, body);
+function show(el, on = true) { el.classList.toggle("hidden", !on); }
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function list(el, items) { el.innerHTML = items.length ? items.map((i) => `<li>${esc(i)}</li>`).join("") : "<li>None noted</li>"; }
+async function busy(btn, statusEl, fn) {
+  btn.disabled = true; if (statusEl) show(statusEl);
+  try { await fn(); } finally {
+    btn.disabled = false; if (statusEl) show(statusEl, false);
+    try { if (session.go || session.assess) saveSession(); } catch {}
+  }
+}
+const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "";
+const mailto = (to, subject, body) => `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+// ----- Email with a match table -----
+// Turns the plain-text email into HTML: "• requirement → proof" rows become a two-column table,
+// other "•" lines become a list, links become clickable. Edits in the textarea carry over.
+function bodyToHtml(text) {
+  // Every URL becomes a clickable link that shows the full address ("LinkedIn: https://…").
+  const link = (s) => esc(s).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1">$1</a>');
+  const cell = "border:1px solid #d0d0d0;padding:6px 10px;vertical-align:top;text-align:left";
+  const out = [];
+  for (const block of text.trim().split(/\n\s*\n/)) {
+    let i = 0;
+    const lines = block.split("\n");
+    while (i < lines.length) {
+      const line = lines[i];
+      if (/^•\s.+\s→\s.+/.test(line)) {
+        const rows = [];
+        while (i < lines.length && /^•\s.+\s→\s.+/.test(lines[i])) {
+          const [need, done] = lines[i].replace(/^•\s*/, "").split(/\s→\s/);
+          rows.push(`<tr><td style="${cell}">${link(need)}</td><td style="${cell}">${link(done)}</td></tr>`);
+          i++;
+        }
+        out.push(`<table style="border-collapse:collapse;margin:6px 0"><tr><th style="${cell};background:#f2f2f2">Top requirements for the role</th><th style="${cell};background:#f2f2f2">How I match</th></tr>${rows.join("")}</table>`);
+      } else if (/^•\s/.test(line)) {
+        const items = [];
+        while (i < lines.length && /^•\s/.test(lines[i]) && !/\s→\s/.test(lines[i])) items.push(`<li>${link(lines[i++].replace(/^•\s*/, ""))}</li>`);
+        out.push(`<ul style="margin:4px 0;padding-left:20px">${items.join("")}</ul>`);
+      } else {
+        const para = [];
+        while (i < lines.length && !/^•\s/.test(lines[i])) para.push(link(lines[i++]));
+        out.push(`<p style="margin:0 0 10px">${para.join("<br>")}</p>`);
+      }
+    }
+  }
+  return `<div style="font-family:Arial,sans-serif;font-size:14px;line-height:1.45">${out.join("")}</div>`;
+}
+async function copyWithTable(text, btn) {
+  const html = bodyToHtml(text);
+  try {
+    await navigator.clipboard.write([new ClipboardItem({
+      "text/html": new Blob([html], { type: "text/html" }),
+      "text/plain": new Blob([text], { type: "text/plain" }),
+    })]);
+    const label = btn.textContent; btn.textContent = "Copied: paste into the Gmail body";
+    setTimeout(() => btn.textContent = label, 2500);
+  } catch { await copyText(text, btn); } // rich copy blocked: copy plain text instead
+}
+
+// ----- Story Builder -----
+const SB = { method: null, stories: [], editingId: null, mode: "new", comps: [], shaped: null };
+const PART_KEYS = ["hook", "situation", "bridge1", "actions", "bridge2", "result", "lesson"];
+const gaps = (s) => (JSON.stringify(s).match(/\[missing:/g) || []).length;
+
+async function loadStories() {
+  const d = await api("GET", "/api/story-builder");
+  SB.method = d.method; SB.stories = d.stories;
+  $("coverage").innerHTML = d.method.competencies.map((c) =>
+    `<span class="chip ${d.coverage[c] ? "on" : "gap"}">${esc(c)}${d.coverage[c] ? ` · ${d.coverage[c]}` : ""}</span>`).join("");
+  $("methodGuide").innerHTML = `<ol>${d.method.parts.map((p) => `<li><b>${esc(p.label)}</b> (${esc(p.time)}): ${esc(p.guide)}</li>`).join("")}</ol>
+    <h3>Coaching rules</h3><ul>${d.method.rules.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>`;
+  $("storyCards").innerHTML = d.stories.length ? d.stories.map((s) => `
+    <div class="entry" id="st-${s.id}">
+      <div class="entry-head">
+        <div><b>${esc(s.title)}</b> · ${esc([s.company, s.period].filter(Boolean).join(", "))}</div>
+        <span class="score ${s.score >= 8 ? "good" : s.score >= 6 ? "stretch" : "poor"}">${s.score ?? "–"}/10</span>
+      </div>
+      <div class="chips">${s.competencies.map((c) => `<span class="chip on">${esc(c)}</span>`).join("")}</div>
+      <div class="note">${esc(s.hook.replace(/\[missing:[^\]]*\]/g, "").slice(0, 220))}…</div>
+      <div class="note">${gaps(s) ? `${gaps(s)} gap${gaps(s) > 1 ? "s" : ""} for you to fill. ` : ""}${s.useInOutreach ? "Used in CVs and outreach." : "Not used in CVs or outreach."}</div>
+      <button class="ghost small" data-edit="${s.id}">Open and improve</button>
+      <button class="ghost small" data-del="${s.id}">Delete</button>
+    </div>`).join("") : `<section><p class="note">No stories yet. Click "+ New story" to build your first one.</p></section>`;
+  document.querySelectorAll("#storyCards [data-edit]").forEach((b) => b.onclick = () => openEditor("edit", SB.stories.find((s) => s.id === b.dataset.edit)));
+  document.querySelectorAll("#storyCards [data-del]").forEach((b) => b.onclick = () => confirmClick(b, "Click again to delete", async () => {
+    await api("DELETE", `/api/story-items/${b.dataset.del}`); loadStories();
+  }));
+}
+
+function renderCompPick() {
+  $("compPick").innerHTML = SB.method.competencies.map((c) =>
+    `<button class="chip ${SB.comps.includes(c) ? "sel" : ""}" data-c="${esc(c)}">${esc(c)}</button>`).join("");
+  document.querySelectorAll("#compPick [data-c]").forEach((b) => b.onclick = () => {
+    const c = b.dataset.c;
+    SB.comps = SB.comps.includes(c) ? SB.comps.filter((x) => x !== c) : [...SB.comps, c].slice(-3);
+    renderCompPick();
+  });
+  $("compQuestion").textContent = SB.comps[0] ? `Interviewers ask: "${SB.method.questions[SB.comps[0]]}"` : "";
+}
+
+function openEditor(mode, story) {
+  SB.mode = mode; SB.editingId = story?.id ?? null; SB.comps = story?.competencies ?? [];
+  $("editorTitle").textContent = mode === "edit" ? story.title : mode === "import" ? "Import a story" : "New story";
+  show($("roughNotes"), mode === "new");
+  show($("importBox"), mode === "import");
+  show($("shapeBtn"), mode !== "edit");
+  ["n_situation", "n_hard", "n_actions", "n_pushback", "n_result", "n_lesson", "importText", "answers"].forEach((id) => $(id).value = "");
+  show($("shapeErr"), false); $("saveNote").textContent = "";
+  renderCompPick();
+  if (mode === "edit") renderShaped(story, null); else show($("shaped"), false);
+  show($("storyEditor"));
+  $("storyEditor").scrollIntoView({ behavior: "smooth" });
+}
+$("storyNew").onclick = () => openEditor("new");
+$("storyImport").onclick = () => openEditor("import");
+
+function renderShaped(s, feedback) {
+  SB.shaped = s;
+  $("s_title").value = s.title || ""; $("s_company").value = s.company || ""; $("s_period").value = s.period || "";
+  $("s_use").checked = s.useInOutreach ?? true;
+  if (s.competencies?.length && !SB.comps.length) { SB.comps = s.competencies; renderCompPick(); }
+  const parts = Object.fromEntries(SB.method.parts.map((p) => [p.key, p]));
+  $("partFields").innerHTML = PART_KEYS.map((k) => {
+    const p = parts[k];
+    const head = `<label>${esc(p.label)} <span class="tag">${esc(p.time)}</span></label><div class="part-guide">${esc(p.guide)}</div>`;
+    if (k === "actions") {
+      const acts = [...(s.actions || []), "", ""].slice(0, 3);
+      return head + acts.map((a, i) => `<textarea data-act="${i}" rows="4" placeholder="Action ${i + 1}">${esc(a)}</textarea>`).join("");
+    }
+    return head + `<textarea data-part="${k}" rows="${k === "situation" ? 4 : 3}">${esc(s[k] || "")}</textarea>`;
+  }).join("");
+  $("numbersList").innerHTML = (s.numbers || []).length
+    ? `<ul>${s.numbers.map((n) => `<li>${esc(n.claim)} ${n.baseline ? `<span class="tag">baseline: ${esc(n.baseline)}</span>` : `<span class="poor">· no baseline yet</span>`}</li>`).join("")}</ul>`
+    : "No numbers yet. Every strong story has at least one, with its baseline.";
+  const fb = feedback;
+  $("coachBox").innerHTML = fb ? `
+    <h3>Coach: <span class="score ${fb.score >= 8 ? "good" : fb.score >= 6 ? "stretch" : "poor"}">${fb.score}/10</span></h3>
+    ${fb.strengths.length ? `<b>Working</b><ul>${fb.strengths.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+    ${fb.fixes.length ? `<b>Fix next</b><ul>${fb.fixes.map((f) => `<li><b>${esc(f.part)}:</b> ${esc(f.issue)} <i>Try:</i> ${esc(f.suggestion)}</li>`).join("")}</ul>` : ""}
+    ${fb.questions.length ? `<b>Questions for you</b><ol>${fb.questions.map((q) => `<li>${esc(q)}</li>`).join("")}</ol>` : ""}`
+    : `<div class="note">${gaps(s) ? `This story has ${gaps(s)} gap${gaps(s) > 1 ? "s" : ""} marked [missing: …]. Fill them in the fields above or answer below, then click Improve for fresh coaching.` : "Click Improve for fresh coaching on this story."} Last score: ${s.score ?? "–"}/10.</div>`;
+  show($("shaped"));
+}
+
+function currentDraft() {
+  const s = { ...(SB.shaped || {}) };
+  s.title = $("s_title").value; s.company = $("s_company").value; s.period = $("s_period").value;
+  s.competencies = SB.comps;
+  document.querySelectorAll("#partFields [data-part]").forEach((t) => s[t.dataset.part] = t.value);
+  s.actions = [...document.querySelectorAll("#partFields [data-act]")].map((t) => t.value).filter((v) => v.trim());
+  return s;
+}
+
+async function runShape(payload, btn) {
+  show($("shapeErr"), false);
+  await busy(btn, $("shapeStatus"), async () => {
+    try {
+      const r = await post("/api/stories/shape", { ...payload, competencies: SB.comps });
+      addCost(r.cost);
+      const { feedback, cost, ...story } = r;
+      renderShaped({ ...story, id: SB.editingId, useInOutreach: $("s_use").checked, score: feedback.score }, feedback);
+    } catch (e) { $("shapeErr").textContent = e.message; show($("shapeErr")); }
+  });
+}
+$("shapeBtn").onclick = () => SB.mode === "import"
+  ? runShape({ text: $("importText").value }, $("shapeBtn"))
+  : runShape({ notes: {
+      situation: $("n_situation").value, "what made it hard": $("n_hard").value, "what I did": $("n_actions").value,
+      "who pushed back": $("n_pushback").value, result: $("n_result").value, lesson: $("n_lesson").value,
+    } }, $("shapeBtn"));
+$("improveBtn").onclick = () => runShape({ draft: currentDraft(), answers: $("answers").value }, $("improveBtn"));
+
+$("saveStory").onclick = () => busy($("saveStory"), null, async () => {
+  const s = currentDraft();
+  try {
+    const saved = await post("/api/story-items", {
+      id: SB.editingId ?? undefined, title: s.title, company: s.company, period: s.period, competencies: s.competencies,
+      hook: s.hook || "", situation: s.situation || "", bridge1: s.bridge1 || "", actions: s.actions || [], bridge2: s.bridge2 || "",
+      result: s.result || "", lesson: s.lesson || "", numbers: s.numbers || [], useInOutreach: $("s_use").checked, score: s.score ?? null,
+    });
+    SB.editingId = saved.id;
+    $("saveNote").textContent = gaps(saved) ? `Saved. ${gaps(saved)} gap(s) still marked [missing: …]; they're left out of CVs and emails until you fill them.` : "Saved.";
+    loadStories();
+  } catch (e) { $("saveNote").textContent = e.message; }
+});
+
+// Outside links open in a new Chrome window: inside the app's panel they replaced the app and lost the work.
+document.addEventListener("click", async (ev) => {
+  const a = ev.target.closest && ev.target.closest("a[href^='http']");
+  if (!a || a.href.startsWith(location.origin)) return;
+  ev.preventDefault();
+  try { await post("/api/open-url", { url: a.href }); }
+  catch { window.open(a.href, "_blank", "noopener"); }
+}, true);
+
+// ----- Tabs -----
+function tab(name) {
+  $("tabJobs").classList.toggle("on", name === "jobs");
+  show($("viewJobs"), name === "jobs");
+  if (name === "jobs") loadJobs();
+  $("tabStories").classList.toggle("on", name === "stories");
+  $("tabNew").classList.toggle("on", name === "new");
+  $("tabTracker").classList.toggle("on", name === "tracker");
+  show($("viewStories"), name === "stories");
+  show($("viewNew"), name === "new");
+  show($("viewTracker"), name === "tracker");
+  if (name === "tracker") loadTracker();
+  if (name === "stories") loadStories();
+}
+$("tabStories").onclick = () => tab("stories");
+$("tabJobs").onclick = () => tab("jobs");
+$("tabNew").onclick = () => tab("new");
+$("tabTracker").onclick = () => tab("tracker");
+
+fetch("/api/profile").then((r) => r.json()).then((p) => {
+  $("profile").textContent = p.words
+    ? `Using your base CV from profile/base-cv.md (${p.words} words).`
+    : "No base CV found. Add it to profile/base-cv.md.";
+});
+
+// ----- Stage 1: fit -----
+$("assess").onclick = () => busy($("assess"), $("assessStatus"), async () => {
+  show($("assessErr"), false);
+  ["fitSec", "cvSec", "hmSec", "draftSec"].forEach((id) => show($(id), false));
+  try {
+    state.jd = $("jd").value;
+    const r = await post("/api/assess", { jd: state.jd, company: $("company").value });
+    addCost(r.cost, r.cached);
+    session.assess = r; session.go = null; saveSession();
+    // Started from the Jobs tab: the full check replaces the quick score there.
+    if (state.fromJob) api("PATCH", `/api/jobs/${state.fromJob}`, { score: r.fit.score, verdict: r.fit.verdict, reason: r.fit.recommendation }).catch(() => {});
+    renderAssess(r);
+  } catch (e) { $("assessErr").textContent = e.message; show($("assessErr")); }
+});
+
+function renderAssess(r) {
+    state.analysis = r.analysis;
+    state.fit = { verdict: r.fit.verdict, score: r.fit.score, reasonsFor: r.fit.reasonsFor };
+    const f = r.fit, a = r.analysis;
+    $("verdict").textContent = `${f.verdict} fit`;
+    $("verdict").className = f.verdict;
+    $("score").textContent = `${f.score}/10 · ${a.roleTitle} at ${a.company}`;
+    $("recommendation").textContent = f.recommendation;
+    list($("for"), f.reasonsFor);
+    list($("against"), f.reasonsAgainst);
+    renderStoryOptions(r.storyOptions ?? []);
+    const rows = [
+      ["Department", a.department], ["Sub-department", a.subDepartment], ["Seniority", a.seniority],
+      ["Likely HM title", a.likelyHiringManagerTitle], ["Core problem", a.coreProblem], ["Why", a.orgReasoning],
+    ];
+    $("org").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("");
+    const weak = f.verdict === "poor" || f.verdict === "stretch";
+    $("go").textContent = weak ? "Proceed anyway" : "Go ahead: tailor CV, find hiring manager, draft email";
+    $("go").className = weak ? "ghost" : "";
+    show($("fitSec"));
+}
+
+// ----- Stage 2: go ahead -----
+$("go").onclick = () => busy($("go"), $("goStatus"), async () => {
+  show($("goErr"), false);
+  try {
+    const r = await post("/api/go", { jd: state.jd, analysis: state.analysis, fit: state.fit, leadStory: state.leadStory, secondStory: state.secondStory ?? null, hiringTeam: $("hiringTeam").value });
+    addCost(r.cost);
+    session.go = r; session.edits = {}; saveSession();
+    renderGo(r);
+  } catch (e) { $("goErr").textContent = e.message; show($("goErr")); }
+});
+
+function renderGround(g) {
+  const box = $("groundBox");
+  if (g && g.overlaps && g.overlaps.length) {
+    box.innerHTML = `<b>Common ground:</b> ${g.overlaps.map((o) => esc(o.detail)).join(" · ")}. The email opens with it.`;
+  } else {
+    box.innerHTML = "<b>No common ground found</b> with this person in public profiles. The email opens with a short human line instead, and the warm route below is likely to work better.";
+  }
+  show(box);
+}
+// A LinkedIn note under 200 characters (the limit for free accounts).
+function referralNote(p) {
+  const first = p.name.trim().split(/\s+/)[0];
+  const shared = p.sharedWith.replace(/\s*\(.*\)\s*/g, "").trim(); // "ex-Amazon (Amazon Studios)" → "ex-Amazon"
+  const role = state.analysis.roleTitle.replace(/\s*\(.*\)\s*$/, "");
+  let note = `Hi ${first}, I noticed we're both ${shared}. I applied for the ${role} role at ${state.analysis.company}. Could I get 10 minutes of your view on the team, and a referral if it looks like a fit?`;
+  if (note.length > 200) note = `Hi ${first}, we're both ${shared}. I applied for the ${role} role at ${state.analysis.company}. Would you share 10 minutes on the team, and refer me if it fits?`;
+  return note.slice(0, 200);
+}
+function renderReferrers(list) {
+  show($("refSec"), true);
+  $("refList").innerHTML = list && list.length ? list.map((p, i) => `
+    <div class="card"><b>${esc(p.name)}</b> · ${esc(p.title)} <span class="tag">${esc(p.sharedWith)}</span>
+      ${p.linkedinUrl ? `<a class="btn ghost small" href="${esc(p.linkedinUrl)}" target="_blank" rel="noopener">LinkedIn profile</a>` : ""}
+      <button class="ghost small" data-refsent="${i}">I sent a request</button></div>`).join("")
+    : '<div class="note">No one found at this company with a shared employer or school. Check your LinkedIn for 1st- or 2nd-degree connections there.</div>';
+  document.querySelectorAll("[data-refsent]").forEach((b) => b.onclick = async () => {
+    const p = list[Number(b.dataset.refsent)];
+    try {
+      await post("/api/connections", { ...p, company: state.analysis.company, roleTitle: state.analysis.roleTitle, entryId: state.entryId });
+      b.textContent = "Added to the Tracker"; b.disabled = true;
+    } catch (err) { b.textContent = err.message; }
+  });
+}
+
+function renderGo(r) {
+    state.entryId = r.entryId;
+    renderCV(r.cv, r.cvFile);
+    show($("clOpen"), false); $("clMake").textContent = "Create cover letter (~$0.02)"; $("clNote").textContent = "Only if the application asks for one.";
+    state.emailPattern = r.emailPattern;
+    $("domain").value = r.domain || state.analysis.companyDomain || "";
+    $("hmNotes").textContent = r.notes.join(" ");
+    renderCandidates(r.candidates);
+    renderGround(r.ground);
+    renderReferrers(r.referrers);
+    renderDraft(r.draft);
+    state.cvFile = r.cvFile;
+    Object.assign(rec, { candidates: [], selected: null, pattern: r.recruiterPattern, subjects: [], entryId: null });
+    $("rNotes").textContent = r.recruiterNotes.join(" ");
+    renderRecruiters(r.recruiters);
+    show($("recSec")); show($("rDraftSec"), false);
+    $("rMarkSent").disabled = false;
+    $("sentNote").textContent = 'Saved in the Tracker as "Drafted". After you send it, click the button above to start the follow-up timer.';
+    $("sentNote").className = "note";
+    $("markSent").disabled = false;
+    $("nextApp").className = "ghost";
+    show($("cvSec")); show($("hmSec")); show($("draftSec"));
+    refreshBadge();
+}
+
+function renderCV(cv, file) {
+  $("cvSummary").textContent = cv.summary;
+  $("cvOpen").href = `/api/cv/${encodeURIComponent(file)}`;
+  $("cvOpen").textContent = `Download ${file}`;
+  $("cvPreview").innerHTML = cv.experience.map((j) =>
+    `<h3>${esc(j.title)} · ${esc(j.company)}</h3><ul>${j.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>`).join("");
+}
+
+// First card is the pick; the rest fold under "Other options".
+function pickLayout(cards) {
+  if (!cards.length) return "";
+  const [best, ...rest] = cards;
+  return `<div class="note" style="margin-top:4px"><b>Best match</b></div>${best}` +
+    (rest.length ? `<details><summary>Other options (${rest.length})</summary>${rest.join("")}</details>` : "");
+}
+const scoreLine = (c) => c.score != null
+  ? `<div class="note">Score ${c.score} (${c.score >= 5 ? "high" : c.score >= 3 ? "medium" : "low"}): ${esc((c.scoreParts || []).join(", ") || "no rubric points")}</div>` : "";
+
+function renderCandidates(candidates) {
+  state.candidates = candidates;
+  if (!candidates.length) {
+    $("cands").innerHTML = `<p class="note">No named person found. Type a name, or search the web again.
+      Target title: <b>${esc(state.analysis.likelyHiringManagerTitle)}</b>.</p>`;
+    state.selected = null;
+    $("hmName").value = ""; $("hmTitle").value = state.analysis.likelyHiringManagerTitle; $("email").value = "";
+    return;
+  }
+  $("cands").innerHTML = pickLayout(candidates.map((c, i) => `
+    <div class="card" data-i="${i}">
+      <span class="t">${esc(c.name)}</span> — ${esc(c.title)}
+      <span class="pill ${c.confidence}">${esc(c.confidence)}</span><span class="tag">via ${c.via}${c.level ? ` · ${esc(c.level)}` : ""}</span>
+      ${c.linkedinUrl ? ` · <a href="${esc(c.linkedinUrl)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}
+      <div class="note">${esc(c.evidence)}</div>
+      ${c.publicHook ? `<div class="note"><b>Public view:</b> ${esc(c.publicHook)}</div>` : ""}
+      ${c.sources?.length ? `<div class="note">${c.sources.map((s) => `<a href="${esc(s)}" target="_blank" rel="noopener">source</a>`).join(" · ")}</div>` : ""}
+    ${scoreLine(c)}
+    </div>`));
+  document.querySelectorAll("#cands .card").forEach((el) => el.onclick = () => pick(Number(el.dataset.i)));
+  pick(0);
+}
+function pick(i) {
+  const c = state.candidates[i];
+  state.selected = c;
+  document.querySelectorAll("#cands .card").forEach((x) => x.classList.toggle("sel", Number(x.dataset.i) === i));
+  $("hmName").value = c.name; $("hmTitle").value = c.title; $("email").value = c.email || "";
+  $("emailNote").textContent = abbreviated(c.name) && !c.email
+    ? "Only an initial is public for the last name, so no email was guessed. Find the full name (LinkedIn, a podcast or talk), type it above, and click Find email."
+    : emailNote(c.emailSource, c.emailStatus);
+  // Alternates aren't verified up front; check the guess as soon as one is picked.
+  if (c.email && c.emailSource === "pattern" && !c.emailStatus) $("findEmail").click();
+  updateMailto();
+}
+const STATUS_NOTE = { valid: "Verified deliverable.", invalid: "The verifier says this address is invalid; don't send.", accept_all: "The company's mail server accepts every address, so this can't be confirmed. Expect a possible bounce.",
+  alias_guess: "This company uses personal login aliases, so a name-based guess often bounces. Message them on LinkedIn instead, or confirm the address first.", unknown: "Deliverability unknown." };
+const abbreviated = (name) => { const p = (name || "").trim().split(/\s+/); return p.length < 2 || p[p.length - 1].replace(/\./g, "").length < 2; };
+function emailNote(source, status) {
+  const base = source === "hunter" ? "Email from Hunter." : source === "pattern" ? `Guessed from the company's usual email format${state.emailPattern ? ` (${state.emailPattern})` : ""}.` : "";
+  return [base, status ? STATUS_NOTE[status] ?? `Status: ${status}.` : source === "pattern" ? "Unverified." : ""].filter(Boolean).join(" ");
+}
+
+function renderDraft(d) {
+  state.subjects = d.subjects;
+  $("subjects").innerHTML = d.subjects.map((s, i) => `
+    <label class="subj"><input type="radio" name="subject" value="${i}" ${i === 0 ? "checked" : ""} />
+      <span><span>${esc(s.text)}</span><br /><span class="angle">${esc(s.angle)}</span></span></label>`).join("");
+  document.querySelectorAll('input[name="subject"]').forEach((r) => r.onchange = updateMailto);
+  $("body").value = d.body;
+  updateMailto();
+}
+const chosenSubject = () => state.subjects[Number(document.querySelector('input[name="subject"]:checked')?.value ?? 0)]?.text ?? "";
+function updateMailto() {
+  if (!state.subjects.length) return;
+  $("mailto").href = mailto($("email").value, chosenSubject(), $("body").value);
+  const bad = /invalid; don't send/.test($("emailNote").textContent);
+  $("mailto").style.pointerEvents = bad ? "none" : ""; $("mailto").style.opacity = bad ? ".4" : "";
+  $("mailto").title = bad ? "The verifier says this address is invalid" : "";
+  $("emailNote").style.color = bad ? "#c62828" : ""; $("emailNote").style.fontWeight = bad ? "600" : "";
+}
+["email", "body"].forEach((id) => $(id).addEventListener("input", updateMailto));
+
+$("findEmail").onclick = () => busy($("findEmail"), null, async () => {
+  $("emailNote").textContent = "Looking up…";
+  try {
+    const d = await post("/api/email-finder", {
+      domain: $("domain").value, company: state.analysis.company, fullName: $("hmName").value, pattern: state.emailPattern,
+    });
+    $("email").value = d.email || "";
+    $("emailNote").textContent = d.email ? emailNote(d.emailSource, d.emailStatus) : "No email found for this person.";
+    const cur = state.candidates.find((x) => x.name === $("hmName").value); if (cur) Object.assign(cur, { email: d.email, emailSource: d.emailSource, emailStatus: d.emailStatus });
+    updateMailto();
+  } catch (e) { $("emailNote").textContent = e.message; }
+});
+
+$("webSearch").onclick = () => busy($("webSearch"), null, async () => {
+  $("hmNotes").textContent = "Searching the web (about 20–40 seconds)…";
+  try {
+    const { candidates, cost, notes } = await post("/api/people", { analysis: state.analysis, kind: "hm", hiringTeam: $("hiringTeam").value });
+    addCost(cost);
+    $("hmNotes").textContent = candidates.length ? `${candidates.length} found. ${notes.join(" ")}` : `No named person found. ${notes.join(" ")}`;
+    if (candidates.length) renderCandidates(candidates);
+  } catch (e) { $("hmNotes").textContent = e.message; }
+});
+
+$("redraft").onclick = () => busy($("redraft"), null, async () => {
+  show($("draftErr"), false);
+  try {
+    const publicHook = state.selected && state.selected.name === $("hmName").value ? state.selected.publicHook : null;
+    const d = await post("/api/draft", {
+      jd: state.jd, analysis: state.analysis,
+      contact: { name: $("hmName").value, title: $("hmTitle").value, publicHook, fitReasons: state.fit?.reasonsFor, leadStory: state.leadStory },
+      entryId: state.entryId,
+    });
+    addCost(d.cost);
+    renderGround(d.ground);
+    renderDraft(d);
+  } catch (e) { $("draftErr").textContent = e.message; show($("draftErr")); }
+});
+$("storyDraft").onchange = (e) => setLeadStory(e.target.value);
+$("storyRewrite").onclick = () => $("redraft").click();
+
+$("copyTable").onclick = () => copyWithTable($("body").value, $("copyTable"));
+$("copy").onclick = () => navigator.clipboard.writeText(`Subject: ${chosenSubject()}\n\n${$("body").value}`)
+  .then(() => { $("copy").textContent = "Copied"; setTimeout(() => $("copy").textContent = "Copy plain text", 1500); });
+
+// In-page confirmation: the first click arms the button with a warning, a second click within 6 s runs it.
+// (Browser confirm() dialogs are blocked in some embedded browsers, which made buttons look dead.)
+function confirmClick(btn, warning, run) {
+  if (btn.dataset.armed) { clearTimeout(Number(btn.dataset.armed)); delete btn.dataset.armed; btn.textContent = btn.dataset.label; return run(); }
+  btn.dataset.label = btn.textContent;
+  btn.textContent = warning;
+  btn.dataset.armed = String(setTimeout(() => { delete btn.dataset.armed; btn.textContent = btn.dataset.label; }, 6000));
+}
+
+// Not worth pursuing: clear everything and go back to an empty JD box. Nothing was drafted, so nothing is lost.
+$("skipRole").onclick = () => startNext();
+
+// Clears the form for the next JD. Everything from this one is already in the Tracker.
+$("nextApp").onclick = () => {
+  const unsent = !$("markSent").disabled && state.entryId;
+  if (unsent) return confirmClick($("nextApp"), 'Not marked as sent (stays "Drafted"). Click again to continue', startNext);
+  startNext();
+};
+function startNext() {
+  for (const k of Object.keys(session)) delete session[k];
+  try { sessionStorage.removeItem("jdOutreach"); } catch {}
+  Object.assign(state, { fromJob: null, jd: "", analysis: null, fit: null, candidates: [], selected: null, emailPattern: null, entryId: null, subjects: [] });
+  Object.assign(rec, { candidates: [], selected: null, pattern: null, subjects: [], entryId: null });
+  ["company", "jd", "hiringTeam", "hmName", "hmTitle", "domain", "email", "body", "rName", "rTitle", "rEmail", "rBody"].forEach((id) => $(id).value = "");
+  ["fitSec", "cvSec", "hmSec", "refSec", "groundBox", "draftSec", "recSec", "rDraftSec", "assessErr", "goErr", "draftErr", "rDraftErr"].forEach((id) => show($(id), false));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  $("jd").focus();
+}
+
+$("markSent").onclick = () => busy($("markSent"), null, async () => {
+  show($("draftErr"), false);
+  try {
+    const e = await post(`/api/tracker/${state.entryId}/sent`, {
+      contact: { name: $("hmName").value, title: $("hmTitle").value, email: $("email").value || null, linkedinUrl: state.selected?.linkedinUrl ?? null },
+      subject: chosenSubject(), body: $("body").value,
+    });
+    $("sentNote").textContent = `Marked as sent. Follow-up due ${fmtDate(e.nextFollowUpAt)}; the Tracker will flag it. Click "Start next application" for the next JD.`;
+    $("sentNote").className = "ok-note";
+    $("markSent").disabled = true;
+    $("nextApp").className = "";
+    refreshBadge();
+  } catch (err) { $("draftErr").textContent = err.message; show($("draftErr")); }
+});
+
+// ----- General CV -----
+$("genCv").onclick = () => busy($("genCv"), null, async () => {
+  $("genCvNote").textContent = "Building your general CV (about 30 seconds)…";
+  try {
+    const r = await post("/api/general-cv", {});
+    addCost(r.cost);
+    $("genCvOpen").href = `/api/cv/${encodeURIComponent(r.file)}?t=${Date.now()}`;
+    show($("genCvOpen"));
+    $("genCv").textContent = "Rebuild general CV (~$0.05)";
+    $("genCvNote").textContent = `Saved as ${r.file}.`;
+  } catch (e) { $("genCvNote").textContent = e.message; }
+});
+
+// ----- Cover letter (optional) -----
+async function makeCoverLetter(entryId, btn, openLink, note) {
+  await busy(btn, null, async () => {
+    note.textContent = "Writing the cover letter…";
+    try {
+      const r = await post(`/api/tracker/${entryId}/cover-letter`, entryId === state.entryId ? { leadStory: state.leadStory, secondStory: state.secondStory ?? null } : {});
+      addCost(r.cost);
+      openLink.href = `/api/cv/${encodeURIComponent(r.file)}`;
+      openLink.textContent = "Download cover letter";
+      show(openLink);
+      btn.textContent = "Rewrite cover letter (~$0.02)";
+      note.textContent = `Saved as ${r.file}.`;
+    } catch (e) { note.textContent = e.message; }
+  });
+}
+$("clMake").onclick = () => makeCoverLetter(state.entryId, $("clMake"), $("clOpen"), $("clNote"));
+
+// ----- Recruiter -----
+// The paragraph between "Hi <name>," and "Going through the JD" in the hiring-manager email,
+// including any edits made in the textarea. The recruiter email reuses it as its intro.
+// Every paragraph between "Hi …," and "Going through the JD" (the warm intro can run to two paragraphs).
+function hmIntro(body) {
+  const parts = (body || "").split(/\n\s*\n/);
+  if (parts.length < 2 || !/^Hi\b/.test(parts[0])) return null;
+  const end = parts.findIndex((p, i) => i > 0 && /^Going through/.test(p));
+  const intro = parts.slice(1, end < 0 ? 2 : end).join("\n\n").trim();
+  return intro || null;
+}
+function renderRecruiters(list) {
+  rec.candidates = list;
+  if (!list.length) {
+    $("rCands").innerHTML = `<p class="note">No recruiter found yet. Search the web, or type a name you found on LinkedIn.</p>`;
+    rec.selected = null;
+    $("rName").value = ""; $("rTitle").value = "Recruiter"; $("rEmail").value = ""; $("rEmailNote").textContent = "";
+    return;
+  }
+  $("rCands").innerHTML = pickLayout(list.map((c, i) => `
+    <div class="card" data-i="${i}">
+      <span class="t">${esc(c.name)}</span> — ${esc(c.title)}
+      <span class="pill ${c.confidence}">${esc(c.confidence)}</span><span class="tag">via ${c.via}${c.level ? ` · ${esc(c.level)}` : ""}</span>
+      ${c.linkedinUrl ? ` · <a href="${esc(c.linkedinUrl)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}
+      <div class="note">${esc(c.evidence)}</div>
+      ${c.sources?.length ? `<div class="note">${c.sources.map((s) => `<a href="${esc(s)}" target="_blank" rel="noopener">source</a>`).join(" · ")}</div>` : ""}
+    ${scoreLine(c)}
+    </div>`));
+  document.querySelectorAll("#rCands .card").forEach((el) => el.onclick = () => pickRecruiter(Number(el.dataset.i)));
+  pickRecruiter(0);
+}
+function pickRecruiter(i) {
+  const c = rec.candidates[i];
+  rec.selected = c;
+  document.querySelectorAll("#rCands .card").forEach((x) => x.classList.toggle("sel", Number(x.dataset.i) === i));
+  $("rName").value = c.name; $("rTitle").value = c.title; $("rEmail").value = c.email || "";
+  $("rEmailNote").textContent = abbreviated(c.name) && !c.email
+    ? "Only an initial is public for the last name, so no email was guessed. Find the full name (LinkedIn, a podcast or talk), type it above, and click Find email."
+    : emailNote(c.emailSource, c.emailStatus).replace(state.emailPattern ?? "\u0000", rec.pattern ?? "");
+  if (c.email && c.emailSource === "pattern" && !c.emailStatus) $("rFindEmail").click();
+  updateRecMailto();
+}
+const recSubject = () => rec.subjects[Number(document.querySelector('input[name="rSubject"]:checked')?.value ?? 0)]?.text ?? "";
+function updateRecMailto() {
+  if (!rec.subjects.length) return;
+  $("rMailto").href = mailto($("rEmail").value, recSubject(), $("rBody").value);
+  const bad = /invalid; don't send/.test($("rEmailNote").textContent);
+  $("rMailto").style.pointerEvents = bad ? "none" : ""; $("rMailto").style.opacity = bad ? ".4" : "";
+  $("rEmailNote").style.color = bad ? "#c62828" : ""; $("rEmailNote").style.fontWeight = bad ? "600" : "";
+}
+["rEmail", "rBody"].forEach((id) => $(id).addEventListener("input", updateRecMailto));
+
+$("rFindEmail").onclick = () => busy($("rFindEmail"), null, async () => {
+  $("rEmailNote").textContent = "Looking up…";
+  try {
+    const d = await post("/api/email-finder", {
+      domain: $("domain").value, company: state.analysis.company, fullName: $("rName").value, pattern: rec.pattern ?? state.emailPattern,
+    });
+    $("rEmail").value = d.email || "";
+    $("rEmailNote").textContent = d.email ? emailNote(d.emailSource, d.emailStatus) : "No email found for this person.";
+    const cur = rec.candidates.find((x) => x.name === $("rName").value); if (cur) Object.assign(cur, { email: d.email, emailSource: d.emailSource, emailStatus: d.emailStatus });
+    updateRecMailto();
+  } catch (e) { $("rEmailNote").textContent = e.message; }
+});
+
+$("rWebSearch").onclick = () => busy($("rWebSearch"), null, async () => {
+  $("rNotes").textContent = "Searching the web for a recruiter (about 20–40 seconds)…";
+  try {
+    const { candidates, cost, notes } = await post("/api/people", { analysis: state.analysis, kind: "recruiter", hiringTeam: $("hiringTeam").value });
+    addCost(cost);
+    $("rNotes").textContent = candidates.length ? `${candidates.length} found. ${notes.join(" ")}` : `No recruiter found. ${notes.join(" ")}`;
+    if (candidates.length) renderRecruiters(candidates);
+  } catch (e) { $("rNotes").textContent = e.message; }
+});
+
+$("rDraft").onclick = () => busy($("rDraft"), null, async () => {
+  show($("rDraftErr"), false);
+  try {
+    const d = await post("/api/recruiter-draft", {
+      jd: state.jd, analysis: state.analysis, fit: state.fit, cvFile: state.cvFile, entryId: rec.entryId, leadStory: state.leadStory,
+      hmIntro: hmIntro($("body").value),
+      contact: { name: $("rName").value, title: $("rTitle").value, email: $("rEmail").value || null, linkedinUrl: rec.selected?.linkedinUrl ?? null },
+    });
+    addCost(d.cost);
+    rec.entryId = d.entryId;
+    rec.subjects = d.subjects;
+    $("rSubjects").innerHTML = d.subjects.map((s, i) => `
+      <label class="subj"><input type="radio" name="rSubject" value="${i}" ${i === 0 ? "checked" : ""} />
+        <span><span>${esc(s.text)}</span><br /><span class="angle">${esc(s.angle)}</span></span></label>`).join("");
+    document.querySelectorAll('input[name="rSubject"]').forEach((r) => r.onchange = updateRecMailto);
+    $("rBody").value = d.body;
+    updateRecMailto();
+    $("rSentNote").textContent = 'Saved in the Tracker as a separate "Recruiter" entry. After you send it, click the button above to start its follow-up timer.';
+    $("rSentNote").className = "note";
+    show($("rDraftSec"));
+    $("rDraftSec").scrollIntoView({ behavior: "smooth" });
+    refreshBadge();
+  } catch (e) { $("rDraftErr").textContent = e.message; show($("rDraftErr")); show($("rDraftSec")); }
+});
+
+$("rCopyTable").onclick = () => copyWithTable($("rBody").value, $("rCopyTable"));
+$("rCopy").onclick = () => navigator.clipboard.writeText(`Subject: ${recSubject()}\n\n${$("rBody").value}`)
+  .then(() => { $("rCopy").textContent = "Copied"; setTimeout(() => $("rCopy").textContent = "Copy plain text", 1500); });
+
+$("rMarkSent").onclick = () => busy($("rMarkSent"), null, async () => {
+  show($("rDraftErr"), false);
+  try {
+    const e = await post(`/api/tracker/${rec.entryId}/sent`, {
+      contact: { name: $("rName").value, title: $("rTitle").value, email: $("rEmail").value || null, linkedinUrl: rec.selected?.linkedinUrl ?? null },
+      subject: recSubject(), body: $("rBody").value,
+    });
+    $("rSentNote").textContent = `Marked as sent. Follow-up due ${fmtDate(e.nextFollowUpAt)}; the Tracker will flag it.`;
+    $("rSentNote").className = "ok-note";
+    $("rMarkSent").disabled = true;
+    refreshBadge();
+  } catch (err) { $("rDraftErr").textContent = err.message; show($("rDraftErr")); }
+});
+
+// ----- Tracker -----
+const STATUSES = ["drafted", "sent", "bounced", "replied", "interviewing", "closed"];
+
+async function refreshBadge() {
+  try {
+    const { dueCount } = await api("GET", "/api/tracker");
+    $("dueBadge").textContent = dueCount;
+    show($("dueBadge"), dueCount > 0);
+  } catch {}
+}
+
+// Copy that works even where the clipboard API is blocked, and always says whether it worked.
+async function copyText(text, btn) {
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; } catch {}
+  if (!ok) {
+    const t = Object.assign(document.createElement("textarea"), { value: text });
+    t.style.cssText = "position:fixed;opacity:0";
+    document.body.appendChild(t); t.select();
+    try { ok = document.execCommand("copy"); } catch {}
+    t.remove();
+  }
+  const label = btn.textContent;
+  btn.textContent = ok ? "Copied" : "Copy failed: select the text and press Cmd+C";
+  setTimeout(() => btn.textContent = label, 2500);
+}
+
+// ----- Jobs: the daily funnel -----
+const ago = (iso) => {
+  if (!iso) return "date unknown";
+  const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  return d <= 0 ? "posted today" : d === 1 ? "posted yesterday" : `posted ${d} days ago`;
+};
+function jobCard(j) {
+  return `<div class="entry" id="job-${j.id}">
+    <div class="entry-head">
+      <div><b>${esc(j.title)}</b> · ${esc(j.company)}${j.target ? ' <span class="tag">Target company</span>' : ""}${j.score ? ` <span class="pill ${esc(j.verdict)}">${esc(j.verdict)} ${j.score}/10</span> <span class="tag">${j.fullCheck ? "full fit check" : "quick score"}</span>` : ""}</div>
+    </div>
+    <div class="note">${esc(j.location || "Location not stated")} · ${ago(j.postedAt)}</div>
+    ${j.reason ? `<div class="note">${esc(j.reason)}</div>` : ""}
+    ${j.status === "started" ? `<span class="tag">${j.inTracker ? "In Tracker" : "Started, not in Tracker yet"}</span> ` : ""}<button class="small${j.status === "started" ? " ghost" : ""}" data-start>${j.status === "started" ? "Start again" : "Start application"}</button>
+    <button class="ghost small" data-open title="Opens in a new Chrome window">Open posting in Chrome</button>
+    <button class="ghost small" data-applied title="You applied outside the app; hide it">Already applied</button>
+    <button class="ghost small" data-dismiss>Not for me</button>
+  </div>`;
+}
+async function loadJobs() {
+  const { jobs: all, meta, running } = await api("GET", "/api/jobs");
+  const started = all.filter((j) => j.status === "started"), jobs = all.filter((j) => j.status === "new");
+  $("jobsBadge").textContent = jobs.filter((j) => (j.score ?? 0) >= 7).length;
+  show($("jobsBadge"), jobs.some((j) => (j.score ?? 0) >= 7));
+  $("jobsMeta").textContent = running ? "Checking job boards now… this takes a few minutes."
+    : meta.lastRun ? `Last checked ${new Date(meta.lastRun).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" })} · ${jobs.length} open roles · ${jobs.filter((j) => (j.score ?? 0) >= 7).length} scored 7+ · ${jobs.filter((j) => j.target).length} at target companies` : "Not checked yet.";
+  const top = jobs.filter((j) => (j.score ?? 0) >= 7), rest = jobs.filter((j) => (j.score ?? 0) < 7);
+  $("jobsList").innerHTML =
+    (started.length ? `<section><h2>Started <span class="tag">${started.length}</span></h2><div class="note">Roles you started but haven't finished. Once you click Go ahead they move to the Tracker; if you applied another way, click Already applied.</div>${started.map(jobCard).join("")}</section>` : "") +
+    `<section><h2>Best matches <span class="tag">${top.length}</span></h2>${top.map(jobCard).join("") || '<div class="note">No strong matches yet.</div>'}</section>` +
+    (rest.length ? `<section><details><summary>Lower scores (${rest.length})</summary>${rest.map(jobCard).join("")}</details></section>` : "");
+  for (const j of all) {
+    const root = $(`job-${j.id}`);
+    root.querySelector("[data-open]").onclick = async (ev) => {
+      const label = ev.target.textContent;
+      try { await post(`/api/jobs/${j.id}/open`, {}); ev.target.textContent = "Opened in Chrome"; }
+      catch (err) { ev.target.textContent = err.message; }
+      setTimeout(() => ev.target.textContent = label, 2500);
+    };
+    const ap = root.querySelector("[data-applied]");
+    if (ap) ap.onclick = async () => { await api("PATCH", `/api/jobs/${j.id}`, { status: "applied" }); root.remove(); };
+    root.querySelector("[data-dismiss]").onclick = async () => { await api("PATCH", `/api/jobs/${j.id}`, { status: "dismissed" }); root.remove(); };
+    root.querySelector("[data-start]").onclick = async (ev) => {
+      ev.target.disabled = true; ev.target.textContent = "Loading the JD…";
+      try {
+        const full = await api("GET", `/api/jobs/${j.id}`);
+        await api("PATCH", `/api/jobs/${j.id}`, { status: "started" });
+        startNext();
+        state.fromJob = j.id;
+        $("company").value = full.company;
+        $("jd").value = `${full.title}\n${full.company} · ${full.location}\n${full.url}\n\n${full.description}`;
+        tab("new");
+        $("assess").click();
+      } catch (err) { ev.target.disabled = false; ev.target.textContent = err.message; }
+    };
+  }
+  if (running) setTimeout(() => { if (!$("viewJobs").classList.contains("hidden")) loadJobs(); }, 15000);
+}
+$("jobsRefresh").onclick = () => busy($("jobsRefresh"), null, async () => {
+  $("jobsMeta").textContent = "Checking job boards now… this takes a few minutes.";
+  try { const r = await post("/api/jobs/refresh", {}); addCost(r.cost); } catch (err) { $("jobsMeta").textContent = err.message; }
+  loadJobs();
+});
+
+// ----- Follow-up queue: one due follow-up at a time, top of the Tracker -----
+const skippedFollowUps = new Set();
+function renderQueue(entries) {
+  const queue = entries.filter((e) => e.due && !skippedFollowUps.has(e.id));
+  const total = entries.filter((e) => e.due).length;
+  show($("fuQueue"), total > 0);
+  if (!total) return;
+  $("fuCount").textContent = `${queue.length} left`;
+  const e = queue[0];
+  if (!e) {
+    $("fuCard").innerHTML = `<div class="note">You skipped the rest. They stay due; reload the Tracker to see them again.</div>`;
+    return;
+  }
+  const n = e.followUps.filter((f) => f.sentAt).length + 1;
+  $("fuCard").innerHTML = `
+    <div class="entry due">
+      <div><b>${esc(e.company)}</b> · ${esc(e.roleTitle)} <span class="tag">${e.contactKind === "recruiter" ? "Recruiter" : "Hiring manager"}</span> <span class="tag">Follow-up ${n} of 2</span></div>
+      <div class="note">${esc(e.contact.name)}${e.contact.title ? `, ${esc(e.contact.title)}` : ""}${e.contact.email ? ` · ${esc(e.contact.email)}` : ""} · first email sent ${fmtDate(e.email.sentAt)}</div>
+      <div data-q><div class="note">Writing the follow-up…</div></div>
+    </div>`;
+  const box = $("fuCard").querySelector("[data-q]");
+  post(`/api/tracker/${e.id}/followup`, {}).then((f) => {
+    addCost(f.cost);
+    renderFollowUp(e, box, f, {
+      onSent: () => loadTracker(),
+      onSkip: () => { skippedFollowUps.add(e.id); loadTracker(); },
+    });
+  }).catch((err) => { box.innerHTML = `<div class="err">${esc(err.message)}</div>`; });
+}
+
+const CONN_LABEL = { requested: "Request sent", accepted: "Accepted", messaged: "Messaged", replied: "Replied", referred: "Referred", no_response: "No response" };
+async function loadConnections() {
+  const { connections } = await api("GET", "/api/connections");
+  $("connCount").textContent = connections.length ? `${connections.filter((c) => c.status === "requested").length} waiting` : "";
+  if (!connections.length) { $("connList").innerHTML = '<div class="note">None yet. Use "I sent a request" in the Warm route section of an application.</div>'; return; }
+  const days = (iso) => Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  $("connList").innerHTML = connections.map((c) => {
+    const stale = c.status === "requested" && days(c.requestedAt) >= 7;
+    return `<div class="entry" id="c-${c.id}">
+      <div class="entry-head"><div><b>${esc(c.name)}</b> · ${esc(c.title)} at ${esc(c.company)} <span class="tag">${esc(c.sharedWith)}</span></div>
+        <select class="inline" data-cstatus>${Object.entries(CONN_LABEL).map(([k, l]) => `<option value="${k}" ${k === c.status ? "selected" : ""}>${l}</option>`).join("")}</select></div>
+      <div class="note">For: ${esc(c.roleTitle || "—")} · request sent ${fmtDate(c.requestedAt)}${c.status !== "requested" ? ` · ${CONN_LABEL[c.status].toLowerCase()} ${fmtDate(c.statusAt)}` : ""}${stale ? ' · <span class="poor">no answer in a week: try email or another person</span>' : ""}</div>
+      ${c.linkedinUrl ? `<a class="btn ghost small" href="${esc(c.linkedinUrl)}">LinkedIn profile</a>` : ""}
+      ${c.status === "requested" ? `<button class="small" data-caccept>Accepted: draft my message</button>` : ""}
+      ${c.status !== "requested" ? `<button class="ghost small" data-cdraft>${c.message ? "Write a different message" : "Draft my message"}</button>` : ""}
+      <button class="ghost small" data-cdel>Remove</button>
+      <div data-cmsg>${c.message ? `<textarea rows="7">${esc(c.message)}</textarea><button class="ghost small" data-ccopy>Copy</button>` : ""}</div>
+    </div>`;
+  }).join("");
+  for (const c of connections) {
+    const root = $(`c-${c.id}`), q = (sel) => root.querySelector(sel);
+    q("[data-cstatus]").onchange = async (ev) => { await api("PATCH", `/api/connections/${c.id}`, { status: ev.target.value }); loadConnections(); };
+    q("[data-cdel]").onclick = (ev) => confirmClick(ev.target, "Click again to remove", async () => { await api("DELETE", `/api/connections/${c.id}`); loadConnections(); });
+    const draft = async (btn) => busy(btn, null, async () => {
+      btn.textContent = "Writing…";
+      try {
+        if (c.status === "requested") await api("PATCH", `/api/connections/${c.id}`, { status: "accepted" });
+        const r = await post(`/api/connections/${c.id}/draft`, {});
+        addCost(r.cost); loadConnections();
+      } catch (err) { btn.textContent = err.message; }
+    });
+    const acc = q("[data-caccept]"); if (acc) acc.onclick = (ev) => draft(ev.target);
+    const dr = q("[data-cdraft]"); if (dr) dr.onclick = (ev) => draft(ev.target);
+    const cp = q("[data-ccopy]"); if (cp) cp.onclick = (ev) => copyText(q("[data-cmsg] textarea").value, ev.target);
+  }
+}
+
+async function loadTracker() {
+  loadConnections().catch(() => {});
+  const { entries, dueCount } = await api("GET", "/api/tracker");
+  renderQueue(entries);
+  $("dueBadge").textContent = dueCount;
+  show($("dueBadge"), dueCount > 0);
+  const active = entries.filter((e) => e.status !== "closed").length;
+  $("trackerSummary").textContent = entries.length
+    ? `${new Set(entries.map((e) => e.cvFile)).size} roles · ${entries.length} emails written · ${entries.filter((e) => e.email.sentAt || ["bounced", "replied", "interviewing"].includes(e.status)).length} sent · ${entries.reduce((n, e) => n + e.followUps.filter((f) => f.sentAt).length, 0)} follow-ups sent · ${dueCount} follow-up${dueCount === 1 ? "" : "s"} due now`
+    : "No applications yet. Use New application, click Go ahead, and it lands here.";
+  renderStanding(entries);
+  renderDays(entries);
+  $("entries").innerHTML = entries.map(entryHtml).join("");
+  entries.forEach(wireEntry);
+}
+
+// ----- Day-by-day and status tables -----
+const dayKey = (iso) => new Date(iso).toLocaleDateString("en-CA"); // YYYY-MM-DD in local time
+const dayLabel = (k) => new Date(`${k}T12:00:00`).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+const who = (e) => `${esc(e.company)} <span class="tag">${e.contactKind === "recruiter" ? "Recruiter" : "HM"}: ${esc(e.contact.name || "no contact")}</span>`;
+
+// A role (one JD) can have several emails: hiring manager, recruiter, extra contacts.
+// Roles take the furthest status any of their emails reached; emails are counted one by one.
+function renderStanding(entries) {
+  const RANK = { closed: 0, bounced: 1, drafted: 1, sent: 2, replied: 3, interviewing: 4 };
+  const roles = {};
+  for (const e of entries) {
+    const r = roles[e.cvFile] ??= { statuses: [] };
+    r.statuses.push(e.status);
+  }
+  const roleStatus = Object.values(roles).map(({ statuses }) =>
+    statuses.every((s) => s === "closed") ? "closed" : statuses.filter((s) => s !== "closed").sort((a, b) => RANK[b] - RANK[a])[0]);
+  const rc = (st) => roleStatus.filter((s) => s === st).length;
+  const ec = (st) => entries.filter((e) => e.status === st).length;
+  const in7 = dayKey(new Date(Date.now() + 7 * 86400000).toISOString());
+  const dueNow = entries.filter((e) => e.due).length;
+  const dueWeek = entries.filter((e) => e.status === "sent" && e.nextFollowUpAt && !e.due && dayKey(e.nextFollowUpAt) <= in7).length;
+  const rows = [
+    ["Total", roleStatus.length, entries.length, "Every role, and every email written (sent or not)"],
+    ["Drafted, not sent", rc("drafted"), ec("drafted"), "Written but not marked sent"],
+    ["Sent, waiting", rc("sent"), ec("sent"), "No reply yet"],
+    ["Bounced", "", ec("bounced"), ec("bounced") ? "Reach these contacts another way (LinkedIn)" : ""],
+    ["Replied", rc("replied"), ec("replied"), ""],
+    ["Interviewing", rc("interviewing"), ec("interviewing"), ""],
+    ["Closed", rc("closed"), ec("closed"), ""],
+    ["Follow-ups due now", "", dueNow, dueNow ? "Highlighted in the list below" : "Nothing overdue"],
+    ["Follow-ups due next 7 days", "", dueWeek, ""],
+  ];
+  const cell = (v) => `<td class="num ${v === 0 ? "zero" : ""}">${v}</td>`;
+  $("standTable").innerHTML = `<tr><th>Status</th><th>Roles</th><th>Emails</th><th>Note</th></tr>` +
+    rows.map(([k, r, e, n]) => `<tr><td>${k}</td>${cell(r)}${cell(e)}<td class="note" style="margin:0">${n}</td></tr>`).join("");
+}
+
+function renderDays(entries) {
+  const days = {};
+  const add = (iso, col, text) => {
+    if (!iso) return;
+    const k = dayKey(iso);
+    days[k] ??= { drafted: [], sent: [], followups: [], replied: [], interviewing: [], closed: [], due: [] };
+    days[k][col].push(text);
+  };
+  for (const e of entries) {
+    add(e.createdAt, "drafted", who(e));
+    add(e.email.sentAt, "sent", who(e));
+    e.followUps.forEach((f, i) => add(f.sentAt, "followups", `${who(e)} <span class="tag">#${i + 1}</span>`));
+    for (const h of e.statusHistory ?? []) if (["replied", "interviewing", "closed"].includes(h.status)) add(h.at, h.status, who(e));
+    if (e.status === "sent" && e.nextFollowUpAt) add(e.nextFollowUpAt, "due", `${who(e)}${e.due ? ' <span class="poor">overdue</span>' : ""}`);
+  }
+  const today = dayKey(new Date().toISOString());
+  days[today] ??= { drafted: [], sent: [], followups: [], replied: [], interviewing: [], closed: [], due: [] };
+  const cols = [["drafted", "Drafted"], ["sent", "Sent"], ["followups", "Follow-ups sent"], ["replied", "Replies"], ["interviewing", "Interviews"], ["closed", "Closed"], ["due", "Follow-ups due"]];
+  const line = (label, items) => items.length ? `<div><b>${label}:</b> ${items.join(" · ")}</div>` : "";
+  // Each day is a row of counts, then a full-width row listing who, so it reads on narrow screens too.
+  $("dayTable").innerHTML = `<tr><th>Date</th>${cols.map(([, l]) => `<th>${l}</th>`).join("")}</tr>` +
+    Object.keys(days).sort().reverse().map((k) => {
+      const d = days[k];
+      const cls = k === today ? "today" : k > today ? "future" : "";
+      return `<tr class="${cls}"><td style="white-space:nowrap"><b>${dayLabel(k)}</b>${k === today ? " <span class='tag'>today</span>" : ""}</td>` +
+        cols.map(([c]) => `<td class="num ${d[c].length ? "" : "zero"}">${d[c].length}</td>`).join("") + `</tr>` +
+        `<tr class="${cls}"><td colspan="${cols.length + 1}" class="what" style="padding-top:0">${cols.map(([c, l]) => line(l, d[c])).join("") || '<span class="note">Nothing yet</span>'}</td></tr>`;
+    }).join("");
+}
+
+function timeline(e) {
+  const parts = [`Drafted ${fmtDate(e.createdAt)}`];
+  if (e.email.sentAt) parts.push(`Sent ${fmtDate(e.email.sentAt)}`);
+  e.followUps.filter((f) => f.sentAt).forEach((f, i) => parts.push(`Follow-up ${i + 1} sent ${fmtDate(f.sentAt)}`));
+  return parts.join(" · ");
+}
+function nextLine(e) {
+  if (e.status === "drafted") return "Not sent yet. Send the email, then mark it sent.";
+  if (e.status !== "sent") return "";
+  if (e.due) return `Follow-up due now (was due ${fmtDate(e.nextFollowUpAt)})`;
+  if (e.nextFollowUpAt) return `Next follow-up ${fmtDate(e.nextFollowUpAt)}`;
+  return "Both follow-ups sent. If there's no reply, close it.";
+}
+
+function entryHtml(e) {
+  const sentFollowUps = e.followUps.filter((f) => f.sentAt).length;
+  const canFollowUp = e.status === "sent" && sentFollowUps < 2;
+  return `
+  <div class="entry ${e.due ? "due" : ""}" id="e-${e.id}">
+    <div class="entry-head">
+      <div><b>${esc(e.company)}</b> · ${esc(e.roleTitle)} <span class="tag">${e.contactKind === "recruiter" ? "Recruiter" : "Hiring manager"}</span> <span class="pill ${esc(e.fit.verdict)}">${esc(e.fit.verdict)} ${e.fit.score}/10</span></div>
+      <select class="inline" data-status>${STATUSES.map((s) => `<option ${s === e.status ? "selected" : ""}>${s}</option>`).join("")}</select>
+    </div>
+    <div class="note">${esc(e.contact.name || "No contact")}${e.contact.title ? `, ${esc(e.contact.title)}` : ""}${e.contact.email ? ` · ${esc(e.contact.email)}` : ""}</div>
+    <div class="note">${timeline(e)}</div>
+    <div class="${e.due ? "dueline" : "note"}">${esc(nextLine(e))}</div>
+    <a class="btn ghost small" href="/api/cv/${encodeURIComponent(e.cvFile)}" download>CV</a>
+    <button class="ghost small" data-view>View email</button>
+    <button class="ghost small" data-cv title="Rebuild this CV from your current base CV (~$0.03)">Rebuild CV</button>
+    ${e.coverLetterFile ? `<a class="btn ghost small" data-clopen href="/api/cv/${encodeURIComponent(e.coverLetterFile)}" download>Cover letter</a>`
+      : `<a class="btn ghost small hidden" data-clopen download>Cover letter</a>`}
+    <button class="ghost small" data-cl>${e.coverLetterFile ? "Rewrite cover letter" : "Create cover letter"}</button>
+    ${e.status === "drafted" ? `<button class="small" data-sent>I sent it</button>` : ""}
+    ${canFollowUp ? `<button class="small ${e.due ? "" : "ghost"}" data-fu>Draft follow-up ${sentFollowUps + 1}</button>` : ""}
+    <button class="ghost small" data-del>Delete</button>
+    <div data-panel class="hidden"></div>
+  </div>`;
+}
+
+function wireEntry(e) {
+  const root = $(`e-${e.id}`);
+  const panel = root.querySelector("[data-panel]");
+  const q = (sel) => root.querySelector(sel);
+
+  q("[data-status]").onchange = async (ev) => { await api("PATCH", `/api/tracker/${e.id}`, { status: ev.target.value }); loadTracker(); };
+  q("[data-del]").onclick = (ev) => confirmClick(ev.target, "Click again to delete", async () => {
+    await api("DELETE", `/api/tracker/${e.id}`); loadTracker();
+  });
+  q("[data-view]").onclick = () => {
+    const open = panel.dataset.mode === "view" && !panel.classList.contains("hidden");
+    panel.dataset.mode = "view";
+    show(panel, !open);
+    const msgs = [{ label: "Original email", ...e.email }, ...e.followUps.map((f, i) => ({ label: `Follow-up ${i + 1}${f.sentAt ? "" : " (draft)"}`, ...f }))];
+    panel.innerHTML = msgs.map((m) => `<label>${m.label}${m.sentAt ? ` · sent ${fmtDate(m.sentAt)}` : ""}</label>
+      <div class="note"><b>${esc(m.subject)}</b></div><pre style="white-space:pre-wrap;font:inherit">${esc(m.body)}</pre>
+      <button class="ghost small" data-copyhtml="${msgs.indexOf(m)}">Copy with table (for Gmail)</button>`).join("");
+    panel.querySelectorAll("[data-copyhtml]").forEach((b) => b.onclick = () => copyWithTable(msgs[Number(b.dataset.copyhtml)].body, b));
+  };
+  q("[data-cv]").onclick = (ev) => busy(ev.target, null, async () => {
+    ev.target.textContent = "Rebuilding…";
+    try { const r = await post(`/api/tracker/${e.id}/cv`, {}); addCost(r.cost); ev.target.textContent = "CV rebuilt"; }
+    catch (err) { ev.target.textContent = err.message; }
+  });
+  q("[data-cl]").onclick = (ev) => {
+    const note = document.createElement("div"); note.className = "note";
+    ev.target.after(note);
+    makeCoverLetter(e.id, ev.target, q("[data-clopen]"), note);
+  };
+  const sentBtn = q("[data-sent]");
+  if (sentBtn) sentBtn.onclick = async () => {
+    await post(`/api/tracker/${e.id}/sent`, { contact: e.contact, subject: e.email.subject, body: e.email.body });
+    loadTracker();
+  };
+  const fuBtn = q("[data-fu]");
+  if (fuBtn) fuBtn.onclick = () => busy(fuBtn, null, async () => {
+    panel.dataset.mode = "fu"; show(panel);
+    panel.innerHTML = `<div class="note">Writing the follow-up…</div>`;
+    try {
+      const f = await post(`/api/tracker/${e.id}/followup`, {});
+      addCost(f.cost);
+      renderFollowUp(e, panel, f);
+    } catch (err) { panel.innerHTML = `<div class="err">${esc(err.message)}</div>`; }
+  });
+}
+
+function renderFollowUp(e, panel, f, queue) {
+  panel.innerHTML = `
+    <label>Subject</label><input data-fsubj value="${esc(f.subject)}" />
+    <label>Body (edit freely)</label><textarea data-fbody rows="10">${esc(f.body)}</textarea>
+    <div class="note">Reply in the same thread as your first email so they see the history.</div>
+    <button class="ghost small" data-fcopy>Copy</button>
+    <a class="btn ghost small" data-fmail>Open in mail app</a>
+    <button class="ghost small" data-fnew>Write a different one (~$0.01)</button>
+    <button class="small" data-fsent>${queue ? "I sent it: next" : "I sent it"}</button>
+    ${queue ? `<button class="ghost small" data-fskip>Skip for now</button>` : ""}
+    <div data-fmsg class="note"></div>`;
+  const body = panel.querySelector("[data-fbody]");
+  const subj = panel.querySelector("[data-fsubj]");
+  const mail = panel.querySelector("[data-fmail]");
+  const sync = () => mail.href = mailto(e.contact.email || "", subj.value, body.value);
+  sync(); body.oninput = sync; subj.oninput = sync;
+  const msg = panel.querySelector("[data-fmsg]");
+  panel.querySelector("[data-fcopy]").onclick = (ev) => copyWithTable(body.value, ev.target); // rich text, so the signature links are clickable
+  panel.querySelector("[data-fnew]").onclick = async (ev) => busy(ev.target, null, async () => {
+    const nf = await post(`/api/tracker/${e.id}/followup`, { fresh: true });
+    addCost(nf.cost);
+    renderFollowUp(e, panel, nf, queue);
+  });
+  panel.querySelector("[data-fsent]").onclick = (ev) => busy(ev.target, null, async () => {
+    msg.className = "note"; msg.textContent = "Saving…";
+    try {
+      const r = await post(`/api/tracker/${e.id}/followup/sent`, { body: body.value });
+      msg.className = "ok-note";
+      msg.textContent = r.nextFollowUpAt ? `Saved. Next follow-up due ${fmtDate(r.nextFollowUpAt)}.` : "Saved. That was the last follow-up.";
+      refreshBadge();
+      setTimeout(() => (queue ? queue.onSent() : loadTracker()), 900);
+    } catch (err) { msg.className = "err"; msg.textContent = `Not saved: ${err.message}`; }
+  });
+  const skip = panel.querySelector("[data-fskip]");
+  if (skip) skip.onclick = () => queue.onSkip();
+}
+
+// ----- Keep the application in progress across reloads -----
+// Saved in this browser tab only. A download, an accidental Back, or a reload no longer loses the work.
+const session = (() => { try { return JSON.parse(sessionStorage.getItem("jdOutreach") || "{}"); } catch { return {}; } })();
+function saveSession() {
+  session.inputs = { company: $("company").value, jd: $("jd").value, hiringTeam: $("hiringTeam").value };
+  session.leadStory = state.leadStory ?? null;
+  session.secondStory = state.secondStory ?? null;
+  if (session.go) {
+    session.edits = {
+      hmName: $("hmName").value, hmTitle: $("hmTitle").value, domain: $("domain").value, email: $("email").value,
+      body: $("body").value, subject: Number(document.querySelector('input[name="subject"]:checked')?.value ?? 0),
+      sent: $("markSent").disabled, sentNote: $("sentNote").textContent,
+      rName: $("rName").value, rTitle: $("rTitle").value, rEmail: $("rEmail").value, rBody: $("rBody").value,
+      rSubjects: rec.subjects, rEntryId: rec.entryId, rSent: $("rMarkSent").disabled,
+      clHref: $("clOpen").classList.contains("hidden") ? null : $("clOpen").getAttribute("href"),
+    };
+  }
+  try { sessionStorage.setItem("jdOutreach", JSON.stringify(session)); } catch {}
+}
+function restoreSession() {
+  if (!session.inputs) return;
+  $("company").value = session.inputs.company || ""; $("jd").value = session.inputs.jd || ""; $("hiringTeam").value = session.inputs.hiringTeam || "";
+  state.jd = session.inputs.jd || "";
+  if (!session.assess) return;
+  renderAssess(session.assess);
+  if (session.secondStory) state.secondStory = session.secondStory;
+  if (session.leadStory) setLeadStory(session.leadStory);
+  if (!session.go) return;
+  renderGo(session.go);
+  const e = session.edits || {};
+  for (const id of ["hmName", "hmTitle", "domain", "email", "body", "rName", "rTitle", "rEmail"]) if (e[id] != null) $(id).value = e[id];
+  const radio = document.querySelector(`input[name="subject"][value="${e.subject ?? 0}"]`); if (radio) radio.checked = true;
+  updateMailto();
+  if (e.sent) { $("markSent").disabled = true; $("sentNote").textContent = e.sentNote; $("sentNote").className = "ok-note"; $("nextApp").className = ""; }
+  if (e.rSubjects?.length) {
+    rec.subjects = e.rSubjects; rec.entryId = e.rEntryId;
+    $("rSubjects").innerHTML = e.rSubjects.map((s, i) => `<label class="subj"><input type="radio" name="rSubject" value="${i}" ${i === 0 ? "checked" : ""} /><span><span>${esc(s.text)}</span><br /><span class="angle">${esc(s.angle)}</span></span></label>`).join("");
+    document.querySelectorAll('input[name="rSubject"]').forEach((r) => r.onchange = updateRecMailto);
+    $("rBody").value = e.rBody || ""; updateRecMailto(); show($("rDraftSec"));
+    if (e.rSent) $("rMarkSent").disabled = true;
+  }
+  if (e.clHref) { $("clOpen").href = e.clHref; show($("clOpen")); }
+  $("spend").textContent = "Restored your application in progress.";
+}
+// Save after any edit or click in the New application view.
+let saveTimer;
+$("viewNew").addEventListener("input", () => { clearTimeout(saveTimer); saveTimer = setTimeout(saveSession, 400); });
+$("viewNew").addEventListener("click", () => setTimeout(saveSession, 1500));
+try { restoreSession(); } catch (err) { console.warn("Could not restore the saved application", err); }
+
+// Start the day on the follow-up queue when anything is due; otherwise the usual start.
+api("GET", "/api/tracker").then(({ dueCount }) => {
+  $("dueBadge").textContent = dueCount; show($("dueBadge"), dueCount > 0);
+  if (dueCount > 0) tab("tracker");
+  else api("GET", "/api/jobs").then(({ jobs }) => { if (jobs.length) tab("jobs"); }).catch(() => {});
+}).catch(() => {});
+api("GET", "/api/story-builder").then((d) => { if (!d.stories.length) tab("stories"); }).catch(() => {});
+</script>
+</body>
+</html>

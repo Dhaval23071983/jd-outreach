@@ -1,0 +1,114 @@
+{
+  "name": "jd-outreach",
+  "version": "1.0.0",
+  "display_name": "JD Outreach",
+  "description": "Paste a job description. Get a fit verdict, tailored CV, hiring manager contact, and outreach email — all matched to your voice and background.",
+  "author": "",
+  "homepage": "",
+  "slots": [
+    {
+      "key": "base_cv",
+      "label": "Base CV",
+      "description": "Your master CV in Markdown. Every tailored CV the app produces is derived from this.",
+      "type": "markdown_file",
+      "path": "profile/base-cv.md",
+      "required": true,
+      "multiline": true,
+      "prompt": "Paste your CV in Markdown (or plain text). Include every role, metric, and tool you want the tailoring engine to draw from."
+    },
+    {
+      "key": "facts",
+      "label": "Career facts",
+      "description": "Hard facts the AI must never contradict: exact titles, company names, date ranges, key numbers.",
+      "type": "markdown_file",
+      "path": "profile/facts.md",
+      "required": true,
+      "multiline": true,
+      "prompt": "List your career facts — one per line. Example:\n  - Title at Acme Corp: Senior Product Manager, Jan 2021–Mar 2024\n  - Grew activation rate from 34% to 61% (Q3 2022)\nThe model treats these as ground truth and will not invent variations."
+    },
+    {
+      "key": "email_example",
+      "label": "Email writing sample",
+      "description": "A real email you wrote. The app copies your sentence rhythm, formality level, and word choices when drafting outreach.",
+      "type": "text_file",
+      "path": "profile/email-example.txt",
+      "required": true,
+      "multiline": true,
+      "prompt": "Paste a professional email you've written. Subject line through sign-off. It should reflect how you sound when you're trying to make a good impression."
+    },
+    {
+      "key": "intro_example",
+      "label": "Intro / cover paragraph sample",
+      "description": "Optional: a cover letter opening or intro paragraph in your voice.",
+      "type": "text_file",
+      "path": "profile/intro-example.txt",
+      "required": false,
+      "multiline": true,
+      "prompt": "Paste an intro paragraph or cover letter opening you've used. If you skip this, the app uses your email sample as the voice reference."
+    },
+    {
+      "key": "signature",
+      "label": "Email signature",
+      "description": "Appended verbatim to every outreach email the app drafts.",
+      "type": "text_file",
+      "path": "profile/signature.txt",
+      "required": true,
+      "multiline": false,
+      "prompt": "Paste your email signature — name, title, phone, LinkedIn, etc."
+    },
+    {
+      "key": "story_rules",
+      "label": "Story rules (optional)",
+      "description": "Personal rules that override the default coaching standard for your interview stories.",
+      "type": "markdown_file",
+      "path": "profile/story-rules.md",
+      "required": false,
+      "multiline": true,
+      "prompt": "Any personal rules for your interview stories? E.g. 'Never mention the 2019 layoff' or 'Always lead with the Payments platform story for fintech roles'. Skip to use the defaults."
+    },
+    {
+      "key": "ties",
+      "label": "Background ties (employers, schools, cities)",
+      "description": "Used to find common ground between you and a hiring manager — shared employer, school, or city.",
+      "type": "text_file",
+      "path": "profile/ties.json",
+      "required": true,
+      "multiline": true,
+      "prompt": "Paste your ties.json — see profile.example/ties.json for the format. List every employer, school, and city associated with your career."
+    },
+    {
+      "key": "env_owner_name",
+      "label": "Your name",
+      "description": "Used as the prefix on every PDF the app generates (e.g. Jane_Doe_Acme_Director.pdf).",
+      "type": "env",
+      "env_var": "OWNER_NAME",
+      "required": true,
+      "sensitive": false
+    },
+    {
+      "key": "env_anthropic",
+      "label": "Anthropic API key",
+      "description": "Powers the fit check, CV tailoring, and email drafting. Get one at console.anthropic.com.",
+      "type": "env",
+      "env_var": "ANTHROPIC_API_KEY",
+      "required": true,
+      "sensitive": true
+    },
+    {
+      "key": "env_hunter",
+      "label": "Hunter.io API key",
+      "description": "Finds hiring manager email addresses. Without it, the app falls back to web search only.",
+      "type": "env",
+      "env_var": "HUNTER_API_KEY",
+      "required": false,
+      "sensitive": true,
+      "fallback_note": "Without this key, hiring manager email lookup uses web search only — slower and less precise."
+    }
+  ],
+  "setup": {
+    "install_commands": ["npm install"],
+    "start_command": "npm run dev",
+    "port": 3040,
+    "open_url": "http://localhost:3040"
+  }
+}
